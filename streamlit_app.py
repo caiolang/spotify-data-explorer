@@ -1,4 +1,3 @@
-import yaml
 import pandas as pd
 
 import spotipy
@@ -10,12 +9,15 @@ import plotly.graph_objects as go
 
 # SPOTIFY API KEYS CONFIG
 try:
+    import yaml
+
     with open("api_keys.yaml", "r") as file:
         api_keys = yaml.safe_load(file)
     CLIENT_ID = api_keys["client_id"]
     CLIENT_SECRET = api_keys["client_secret"]
-except:
-    print("api_keys.yaml file not found. Create it or add environment variables CLIENT_ID and CLIENT_SECRET.")
+except (ModuleNotFoundError, ImportError) as e:
+    print("YAML Import failed.")
+    pass
 
 SPOTIFY_GREEN = "#1DB954"
 
