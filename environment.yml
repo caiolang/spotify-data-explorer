@@ -44,7 +44,7 @@ dependencies:
   # - openssl=1.1.1m=hca72f7f_0
   # - orc=1.6.7=h001ef8f_2
   - pandas=1.1.5=py36hb2f4e1b_0
-  # - pip=21.2.2=py36hecd8cb5_0
+  - pip=21.2.2=py36hecd8cb5_0
   - plotly=5.1.0=pyhd3eb1b0_0
   - pyarrow=4.0.1=py36hdf3e9eb_3
   # - python=3.6.13=h88f2d9e_0
@@ -63,7 +63,7 @@ dependencies:
   # - utf8proc=2.6.1=h9ed2024_0
   # - wheel=0.37.0=pyhd3eb1b0_1
   # - xz=5.2.5=h1de35cc_0
-  # - yaml=0.2.5=haf1e3a3_0
+  - yaml=0.2.5=haf1e3a3_0
   # - zlib=1.2.11=h4dc903c_4
   # - zstd=1.4.9=h322a384_0
   - pip:
