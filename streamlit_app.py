@@ -290,25 +290,24 @@ if page_selector == "Song examiner":
                         )
                     )
 
-                    df_decades = df_tracks.groupby("decade").mean().reset_index()
+                    columns_to_keep = [
+                        "decade",
+                        "danceability",
+                        "energy",
+                        "speechiness",
+                        "acousticness",
+                        "instrumentalness",
+                        "liveness",
+                        "valence",
+                    ]
+
+                    df_decades = df_tracks[columns_to_keep].groupby("decade").mean().reset_index()
+
+                    # st.dataframe(df_decades)
 
                     # User input of decade
                     chosen_decade = st.selectbox("Decade to compare", df_decades["decade"])
-
-                    columns_to_ignore = [
-                        "duration_ms",
-                        "decade",
-                        "year",
-                        "tempo",
-                        "mode",
-                        "key",
-                        "time_signature",
-                        "loudness",
-                        "popularity",
-                        "explicit",
-                    ]
-
-                    df_decade_feats = df_decades.query(f"decade == '{chosen_decade}'").drop(columns=columns_to_ignore).melt()
+                    df_decade_feats = df_decades.query(f"decade == '{chosen_decade}'").drop(columns=["decade"]).melt()
 
                     legend_decade = f"Decade {chosen_decade} average"
                     legend_song = f"{song_name}, {release_date}"
