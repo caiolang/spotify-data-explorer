@@ -10,14 +10,20 @@ import plotly.graph_objects as go
 # SPOTIFY API KEYS CONFIG
 try:
     import yaml
+except (ModuleNotFoundError, ImportError) as e:
+    print("yaml Import failed.")
+    yaml_available = False
+else:
+    yaml_available = True
 
+if yaml_available:
     with open("api_keys.yaml", "r") as file:
         api_keys = yaml.safe_load(file)
     CLIENT_ID = api_keys["client_id"]
     CLIENT_SECRET = api_keys["client_secret"]
-except (ModuleNotFoundError, ImportError) as e:
-    print("YAML Import failed.")
-    pass
+else:
+    CLIENT_ID = st.secrets["client_id"]
+    CLIENT_SECRET = st.secrets["client_secret"]
 
 SPOTIFY_GREEN = "#1DB954"
 
