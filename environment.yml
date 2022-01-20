@@ -66,7 +66,7 @@ dependencies:
   # - yaml=0.2.5=haf1e3a3_0
   # - zlib=1.2.11=h4dc903c_4
   # - zstd=1.4.9=h322a384_0
-  # - pip:
+  - pip:
   #   - altair==4.1.0
   #   - appnope==0.1.2
   #   - argon2-cffi==21.3.0
