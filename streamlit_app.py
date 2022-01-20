@@ -25,7 +25,8 @@ else:
     CLIENT_ID = st.secrets["client_id"]
     CLIENT_SECRET = st.secrets["client_secret"]
 
-SPOTIFY_GREEN = "#1DB954"
+HEX_SPOTIFY_GREEN = "#1DB954"
+HEX_BLUE = "#083D77"
 
 
 @st.experimental_memo
@@ -34,8 +35,8 @@ def load_df(path_csv: str):
 
 
 @st.experimental_memo
-def plot_scatter(df, x, y, color, size, color_continuous_scale="Tealgrn"):
-    return px.scatter(df, x=x, y=y, color=color, size=size, color_continuous_scale=color_continuous_scale)
+def plot_scatter(df, x, y, color, size, width=550, color_continuous_scale="Tealgrn"):
+    return px.scatter(df, x=x, y=y, color=color, size=size, width=width, color_continuous_scale=color_continuous_scale)
 
 
 @st.experimental_memo
@@ -45,7 +46,7 @@ def plot_corr(df, x, method="pearson", color_continuous_scale="Tealgrn"):
 
 
 @st.experimental_memo
-def plot_polar(df_1, df_2, chosen_decade, song_name, release_date):
+def plot_2_polar(df_1, df_2, legend_1, legend_2):
     fig = go.Figure()
 
     fig.add_trace(
@@ -53,7 +54,7 @@ def plot_polar(df_1, df_2, chosen_decade, song_name, release_date):
             r=df_1["value"],
             theta=df_1["variable"],
             fill="toself",
-            name=f"Decade {chosen_decade} average",
+            name=legend_1,
         )
     )
     fig.add_trace(
@@ -61,8 +62,8 @@ def plot_polar(df_1, df_2, chosen_decade, song_name, release_date):
             r=df_2["value"],
             theta=df_2["variable"],
             fill="toself",
-            name=f"{song_name}, {release_date}",
-            # fillcolor=SPOTIFY_GREEN,
+            name=legend_2,
+            # fillcolor=HEX_SPOTIFY_GREEN,
         )
     )
 
@@ -79,7 +80,35 @@ def plot_polar(df_1, df_2, chosen_decade, song_name, release_date):
             pad=5,
         ),
     )
+    return fig
 
+
+@st.experimental_memo
+def plot_1_polar(df, title, colors):
+    fig = px.line_polar(
+        r=df["value"],
+        theta=df["variable"],
+        line_close=True,
+        title=title,
+        color_discrete_sequence=colors,
+        # fillcolor=HEX_SPOTIFY_GREEN,
+    )
+    fig.update_traces(fill="toself")
+    return fig
+
+
+@st.experimental_memo
+def plot_histogram_comparison(df, labels, x="variable", y="value", color="source", height=500):
+    fig = px.histogram(
+        df,
+        x=x,
+        y=y,
+        color=color,
+        labels=labels,
+        barmode="group",
+        color_discrete_sequence=[HEX_BLUE, HEX_SPOTIFY_GREEN],
+        height=height,
+    )
     return fig
 
 
@@ -150,7 +179,8 @@ with header_ctn:
     Using [Streamlit](https://streamlit.io/), the [Spotify Web API](https://developer.spotify.com/documentation/web-api/), [Spotypy](https://spotipy.readthedocs.io/en/2.19.0/) and [Plotly](https://plotly.com/python/).
 
     Have fun! 😃
-    """
+
+    [![GitHub Repo stars](https://img.shields.io/github/stars/caiolang/spotify-data-explorer?label=Star%20this%20repo%21&style=social)](https://gitHub.com/caiolang/spotify-data-explorer) """
     )
 
 # -----------------------
@@ -205,7 +235,7 @@ if page_selector == "Song examiner":
 
                 with cols[0]:
 
-                    track_name = st.text_input("Search for a track", value="Smoke on the Water")
+                    track_name = st.text_input("Search for a track", value="Hey Jude")
                     search_result = sp.search(q=f"track:{track_name}", type="track", limit=3)
 
                     # Fetching song, artist and album information
@@ -280,24 +310,46 @@ if page_selector == "Song examiner":
 
                     df_decade_feats = df_decades.query(f"decade == '{chosen_decade}'").drop(columns=columns_to_ignore).melt()
 
-                    fig = plot_polar(df_decade_feats, df_song_feats, chosen_decade=chosen_decade, song_name=song_name, release_date=release_date)
+                    legend_decade = f"Decade {chosen_decade} average"
+                    legend_song = f"{song_name}, {release_date}"
+
+                    df_decade_feats["source"] = legend_decade  # "decade_avg"
+                    df_song_feats["source"] = legend_song  # "song"
+                    df_comparison = pd.concat([df_decade_feats, df_song_feats])
+
+                    # Bar chart version
+                    fig = plot_histogram_comparison(df_comparison, labels={"variable": "Feature", "source": "Legend"})
+                    st.plotly_chart(fig)
+
+                    # Original version (not working on server)
+                    # fig = plot_2_polar(df_decade_feats, df_song_feats, legend_decade, legend_song)
+                    # st.plotly_chart(fig)
+
+                # Alternative version using polar charts
+                cols = st.columns(2)
+                with cols[0]:
+                    fig = plot_1_polar(df_decade_feats, title=legend_decade, colors=[HEX_BLUE])
+                    st.plotly_chart(fig)
+                with cols[1]:
+                    fig = plot_1_polar(df_song_feats, title=legend_song, colors=[HEX_SPOTIFY_GREEN])
                     st.plotly_chart(fig)
 
                 st.write("## Audio features:")
                 num_decimals = 3
-                cols = st.columns([1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
+                cols = st.columns(5)
                 cols[0].metric("⚡ Energy", round(audio_feat["energy"], num_decimals))
                 cols[1].metric("🕺🏽 Danceability", round(audio_feat["danceability"], num_decimals))
                 cols[2].metric("🎻 Acousticness", round(audio_feat["acousticness"], num_decimals))
                 cols[3].metric("🎼 Instrumentalness", round(audio_feat["instrumentalness"], num_decimals))
                 cols[4].metric("🎫 Liveness", round(audio_feat["liveness"], num_decimals))
-                cols[5].metric("😃 Valence", round(audio_feat["valence"], num_decimals))
-                cols[6].metric("🎤 Speechiness", round(audio_feat["speechiness"], num_decimals))
 
-                cols[7].metric("🔊 Loudness", round(audio_feat["loudness"], num_decimals))
-                cols[8].metric("⏰ Tempo", int(audio_feat["tempo"]))
+                cols = st.columns(5)
+                cols[0].metric("😃 Valence", round(audio_feat["valence"], num_decimals))
+                cols[1].metric("🎤 Speechiness", round(audio_feat["speechiness"], num_decimals))
+                cols[2].metric("🔊 Loudness", round(audio_feat["loudness"], num_decimals))
+                cols[3].metric("⏰ Tempo", int(audio_feat["tempo"]))
                 duration_s = audio_feat["duration_ms"] / 1000
-                cols[9].metric("⏳ Duration", str(f"{int(duration_s//60)}:{round(duration_s%60)}"))
+                cols[4].metric("⏳ Duration", str(f"{int(duration_s//60)}:{round(duration_s%60)}"))
 
         except IndexError:
             popup_ctn.error(":warning: Song not found, please try again.")
