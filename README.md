@@ -3,7 +3,7 @@
 # 🎵 Spotify Data Explorer
 
 An interactive App to play with Spotify data, both from the Spotify Web API and from csv datasets.
-[Check it out here!](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)
+[Check it out here!](https://share.streamlit.io/caiolang/spotify-data-explorer/main)
 
 ## Song Explorer
 Search for a song, and see how much Spotify thinks it is danceable, instrumental, and many other features.

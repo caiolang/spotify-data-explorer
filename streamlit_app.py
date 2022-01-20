@@ -229,7 +229,8 @@ if page_selector == "Song examiner":
 
         try:
             with track_ctn:
-                st.write("## Choose a song and then compare it to a decade!")
+                # st.write("## Choose a song and then compare it to a decade!")
+                st.write("## Choose a song to see its features!")
 
                 cols = st.columns([3, 5])
 
@@ -306,7 +307,8 @@ if page_selector == "Song examiner":
                     # st.dataframe(df_decades)
 
                     # User input of decade
-                    chosen_decade = st.selectbox("Decade to compare", df_decades["decade"])
+                    # chosen_decade = st.selectbox("Decade to compare", df_decades["decade"])
+                    chosen_decade = 1950
                     df_decade_feats = df_decades.query(f"decade == '{chosen_decade}'").drop(columns=["decade"]).melt()
 
                     legend_decade = f"Decade {chosen_decade} average"
@@ -327,11 +329,11 @@ if page_selector == "Song examiner":
                 # Alternative version using polar charts
                 cols = st.columns(2)
                 with cols[0]:
-                    fig = plot_1_polar(df_decade_feats, title=legend_decade, colors=[HEX_BLUE])
-                    st.plotly_chart(fig)
-                with cols[1]:
                     fig = plot_1_polar(df_song_feats, title=legend_song, colors=[HEX_SPOTIFY_GREEN])
                     st.plotly_chart(fig)
+                # with cols[1]:
+                # fig = plot_1_polar(df_decade_feats, title=legend_decade, colors=[HEX_BLUE])
+                # st.plotly_chart(fig)
 
                 st.write("## Audio features:")
                 num_decimals = 3
